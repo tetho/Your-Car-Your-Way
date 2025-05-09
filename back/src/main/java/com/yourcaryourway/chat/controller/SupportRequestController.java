@@ -30,4 +30,9 @@ public class SupportRequestController {
         return supportRequestService.findByUserId(userId);
     }
     
+    @GetMapping("/latest")
+    public SupportRequestDTO getLatestSupportRequest() {
+        return supportRequestService.findLast();
+    }
+    
 }

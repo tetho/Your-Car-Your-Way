@@ -1,8 +1,6 @@
 package com.yourcaryourway.chat.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +29,10 @@ public class ChatMessageService {
 
     public ChatMessageDTO saveMessage(ChatMessageDTO chatMessageDTO) {
     	SupportRequest supportRequest = supportRequestRepository.findById(chatMessageDTO.getSupportRequestId()).orElseThrow();
-    	User sender = userRepository.findById(chatMessageDTO.getSenderUserId()).orElseThrow();
-        User receiver = userRepository.findById(chatMessageDTO.getReceiverUserId()).orElseThrow();
+    	User user = userRepository.findById(chatMessageDTO.getUserId()).orElseThrow();
         ChatMessage message = chatMessageMapper.toEntity(chatMessageDTO);
         message.setSupportRequest(supportRequest);
-        message.setSender(sender);
-        message.setReceiver(receiver);
+        message.setUser(user);
         ChatMessage saved = chatMessageRepository.save(message);
         return chatMessageMapper.toDTO(saved);
     }
@@ -46,7 +42,7 @@ public class ChatMessageService {
         return chatMessageRepository.findBySupportRequest(supportRequest)
                 .stream()
                 .map(chatMessageMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 	
 }

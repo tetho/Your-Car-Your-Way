@@ -8,5 +8,5 @@ public class JwtDTO {
 	private String token;
 	
 	private UserDTO user;
+	
 }
-

@@ -40,5 +40,11 @@ public class SupportRequestService {
                 .map(supportRequestMapper::toDTO)
                 .toList();
     }
+    
+    public SupportRequestDTO findLast() {
+        return supportRequestRepository.findTopByOrderByCreatedAtDesc()
+                .map(SupportRequestMapper.INSTANCE::toDTO)
+                .orElseThrow(() -> new EntityNotFoundException("No support request found"));
+    }
 	
 }

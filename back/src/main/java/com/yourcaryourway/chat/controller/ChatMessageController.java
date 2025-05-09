@@ -26,7 +26,7 @@ public class ChatMessageController {
     }
 
     @GetMapping("/support-request/{id}")
-    public List<ChatMessageDTO> getMessages(@PathVariable int id) {
+    public List<ChatMessageDTO> getMessagesBySupportRequest(@PathVariable int id) {
         return chatMessageService.getMessagesBySupportRequest(id);
     }
     

@@ -13,13 +13,11 @@ public interface ChatMessageMapper {
 	ChatMessageMapper INSTANCE = Mappers.getMapper(ChatMessageMapper.class);
 
 	@Mapping(source = "supportRequest.id", target = "supportRequestId")
-    @Mapping(source = "sender.id", target = "senderUserId")
-    @Mapping(source = "receiver.id", target = "receiverUserId")
+    @Mapping(source = "user.id", target = "userId")
 	ChatMessageDTO toDTO(ChatMessage chatMessage);
     
 	@Mapping(target = "supportRequest", ignore = true)
-    @Mapping(target = "sender", ignore = true)
-    @Mapping(target = "receiver", ignore = true)
+    @Mapping(target = "user", ignore = true)
 	ChatMessage toEntity(ChatMessageDTO chatMessageDTO);
 	
 }

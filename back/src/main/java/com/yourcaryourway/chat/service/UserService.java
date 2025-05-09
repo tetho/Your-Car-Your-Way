@@ -19,11 +19,7 @@ public class UserService {
 	private final UserMapper userMapper = UserMapper.INSTANCE;
 	
 	public Optional<UserDTO> findByEmail(String email) {
-		Optional<User> user = userRepository.findByEmail(email);
-	    if (user.isEmpty()) {
-	    	throw new RuntimeException("User with email " + email + " not found");
-	    }
-	    return user.map(userMapper::toDTO);
+	    return userRepository.findByEmail(email).map(userMapper::toDTO);
 	}
 	
 	public Optional<UserDTO> findById(Integer id) {

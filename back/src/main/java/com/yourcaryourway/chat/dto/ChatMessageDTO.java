@@ -14,11 +14,8 @@ public class ChatMessageDTO {
 	@JsonProperty("support_request_id")
 	private Integer supportRequestId;
 	
-	@JsonProperty("sender_user_id")
-	private Integer senderUserId;
-	
-	@JsonProperty("receiver_user_id")
-	private Integer receiverUserId;
+	@JsonProperty("user_id")
+	private Integer userId;
 	
 	private String text;
 	

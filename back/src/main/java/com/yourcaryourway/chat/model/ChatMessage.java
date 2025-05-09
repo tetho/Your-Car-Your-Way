@@ -29,12 +29,8 @@ public class ChatMessage {
 	private SupportRequest supportRequest;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sender_user_id", referencedColumnName = "user_id", nullable = false)
-	private User sender;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "receiver_user_id", referencedColumnName = "user_id", nullable = false)
-	private User receiver;
+	@JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+	private User user;
 	
 	private String text;
 	
