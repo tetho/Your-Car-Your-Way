@@ -1,14 +1,14 @@
-<div class="chat-box">
-  <h2>Chat</h2>
-
+<div class="chat-container">
   <div class="messages">
-    <div *ngFor="let msg of messages" [class.me]="isMyMessage(msg)" class="message">
-      <span>{{ isMyMessage(msg) ? 'Moi' : 'Autre' }}: {{ msg.text }}</span>
+    <div *ngFor="let message of messages" [class.mine]="isMyMessage(message)">
+      <strong>{{ message.firstname + ' ' + message.name }} :</strong>
+      <div>{{ message.text }}</div>
+      <span class="timestamp">{{ formatTime(message.created_at) }}</span>
     </div>
   </div>
 
   <form (ngSubmit)="sendMessage()">
-    <input [(ngModel)]="newMessage" name="message" placeholder="Tapez votre message..." required />
+    <input type="text" [(ngModel)]="newMessage" name="message" placeholder="Votre message..." required>
     <button type="submit">Envoyer</button>
   </form>
 </div>

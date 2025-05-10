@@ -6,18 +6,24 @@ import java.time.temporal.ChronoUnit;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
 
-    private JwtEncoder jwtEncoder;
+    private final JwtEncoder jwtEncoder;
+    
+    private final JwtDecoder jwtDecoder;
 
-    public JwtService(JwtEncoder jwtEncoder) {
+    public JwtService(JwtEncoder jwtEncoder, JwtDecoder jwtDecoder) {
         this.jwtEncoder = jwtEncoder;
+        this.jwtDecoder = jwtDecoder;
     }
 
     public String generateToken(Authentication authentication) {
@@ -44,6 +50,24 @@ public class JwtService {
             return this.jwtEncoder.encode(jwtEncoderParameters).getTokenValue();
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while generating the JWT token: " + e.getMessage(), e);
+        }
+    }
+    
+    public String extractUsername(String token) {
+        try {
+            Jwt decodedJwt = jwtDecoder.decode(token);
+            return decodedJwt.getSubject();
+        } catch (JwtException e) {
+            throw new RuntimeException("Failed to extract username from token: " + e.getMessage(), e);
+        }
+    }
+    
+    public boolean validateToken(String token) {
+        try {
+            jwtDecoder.decode(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
         }
     }
     

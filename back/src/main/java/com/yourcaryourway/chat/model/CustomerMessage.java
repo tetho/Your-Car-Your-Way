@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,25 +16,23 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "support_request")
-public class SupportRequest {
+@Table(name = "customer_message")
+public class CustomerMessage {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="support_request_id")
-	private Integer id;
-	
+	@Column(name="customer_message_id")
+	private Integer chatMessageId;
+ 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
 	private User user;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(name="support_request_status")
-	private SupportRequestStatus supportRequestStatus;
+	private String text;
 	
 	@Column(name = "created_at", updatable = false)
 	private LocalDateTime createdAt;
-	
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();

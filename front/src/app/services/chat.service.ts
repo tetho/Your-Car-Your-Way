@@ -1,47 +1,59 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ChatMessage } from '../models/chat-message.model';
-import { AuthService } from './auth.service';
-import { SupportRequest } from '../models/support-request.model';
+import { BehaviorSubject } from 'rxjs';
+import { Client, IMessage } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private baseUrl = 'http://localhost:9000';
-  
-  private supportRequestId!: number;
+  private stompClient!: Client;
+  private messagesSubject = new BehaviorSubject<ChatMessage[]>([]);
+  public messages$ = this.messagesSubject.asObservable();
+  private messages: ChatMessage[] = [];
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
-
-  createSupportRequestForCustomer() {
-    const user = this.authService.getUser();
-    return this.http.post<any>(this.baseUrl + `support-requests`, { userId: user.user_id }, { withCredentials: true });
+  constructor() {
+    this.connect();
   }
 
-  setSupportRequestId(id: number) {
-    this.supportRequestId = id;
-  }
+  private connect(): void {
+    this.stompClient = new Client({
+      webSocketFactory: () => new SockJS('http://localhost:9000/ws'),
+      reconnectDelay: 5000,
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      debug: (str) => console.log(str),
+    });
 
-  getSupportRequestId(): number {
-    return this.supportRequestId;
-  }
+    this.stompClient.onConnect = () => {
+      console.log('WebSocket connected');
 
-  sendMessage(text: string) {
-    const user = this.authService.getUser();
-    const message: ChatMessage = {
-      support_request_id: this.supportRequestId,
-      user_id: user.user_id,
-      text: text
+      this.stompClient.subscribe('/topic/messages', (message: IMessage) => {
+        const raw: ChatMessage = JSON.parse(message.body);
+        const msg: ChatMessage = {
+          ...raw,
+          created_at: new Date(raw.created_at)
+        };
+        this.messages.push(msg);
+        this.messagesSubject.next([...this.messages]);
+      });
     };
-    return this.http.post<ChatMessage>(`${this.baseUrl}/chat`, message, { withCredentials: true });
+
+    this.stompClient.onStompError = frame => {
+      console.error('Stomp error:', frame.headers['message'], frame.body);
+    };
+
+    this.stompClient.activate();
   }
 
-  getMessages() {
-    return this.http.get<ChatMessage[]>(this.baseUrl + `/chat/support-request/${this.supportRequestId}`, { withCredentials: true });
-  }
-
-  getLatestSupportRequest() {
-    return this.http.get<SupportRequest>(`${this.baseUrl}/support-requests/latest`, { withCredentials: true });
+  public sendMessage(message: ChatMessage): void {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: '/app/chat',
+        body: JSON.stringify(message),
+      });
+    }
   }
 }

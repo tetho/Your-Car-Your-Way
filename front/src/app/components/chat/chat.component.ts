@@ -9,33 +9,42 @@ import { User } from '../../models/user.model';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit {
   messages: ChatMessage[] = [];
   newMessage = '';
   currentUser!: User;
 
   constructor(private chatService: ChatService, private authService: AuthService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.currentUser = this.authService.getUser();
-    this.loadMessages();
-  }
 
-  sendMessage() {
-    if (!this.newMessage.trim()) return;
-    this.chatService.sendMessage(this.newMessage).subscribe(msg => {
-      this.messages.push(msg);
-      this.newMessage = '';
-    });
-  }
-
-  loadMessages() {
-    this.chatService.getMessages().subscribe(msgs => {
+    this.chatService.messages$.subscribe((msgs) => {
       this.messages = msgs;
     });
   }
 
+  sendMessage(): void {
+    if (!this.newMessage.trim()) return;
+
+    const msg: ChatMessage = {
+      user_id: this.currentUser.user_id,
+      text: this.newMessage,
+      created_at: new Date(),
+      name: this.currentUser.name,
+      firstname: this.currentUser.firstname,
+    };
+
+    this.chatService.sendMessage(msg);
+    this.newMessage = '';
+  }
+
   isMyMessage(msg: ChatMessage): boolean {
     return msg.user_id === this.currentUser.user_id;
+  }
+
+  formatTime(date: string | Date): string {
+    const d = new Date(date);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 }

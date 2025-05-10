@@ -6,9 +6,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SessionService {
-
-  public isLogged = false;
-  public user: User | undefined;
+  private isLogged = false;
+  private user?: User;
 
   private isLoggedSubject = new BehaviorSubject<boolean>(this.isLogged);
 
@@ -19,16 +18,20 @@ export class SessionService {
   public logIn(user: User): void {
     this.user = user;
     this.isLogged = true;
-    this.next();
+    this.isLoggedSubject.next(this.isLogged);
   }
 
   public logOut(): void {
     this.user = undefined;
     this.isLogged = false;
-    this.next();
+    this.isLoggedSubject.next(this.isLogged);
   }
 
-  private next(): void {
-    this.isLoggedSubject.next(this.isLogged);
+  public getUser(): User | undefined {
+    return this.user;
+  }
+
+  public isAuthenticated(): boolean {
+    return this.isLogged;
   }
 }

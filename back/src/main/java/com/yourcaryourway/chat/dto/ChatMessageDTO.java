@@ -8,17 +8,16 @@ import lombok.Data;
 @Data
 public class ChatMessageDTO {
 
-	@JsonProperty("chat_message_id")
-	private Integer chatMessageId;
-	
-	@JsonProperty("support_request_id")
-	private Integer supportRequestId;
-	
 	@JsonProperty("user_id")
 	private Integer userId;
 	
 	private String text;
 	
+	@JsonProperty("created_at")
 	private LocalDateTime createdAt;
+	
+	private String name;
+	
+	private String firstname;
 	
 }

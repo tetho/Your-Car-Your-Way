@@ -10,30 +10,22 @@ import { LoginRequest } from '../interfaces/login-request';
   providedIn: 'root'
 })
 export class AuthService {
-
-  private baseUrl = 'http://localhost:9000';
-  private apiUrl = this.baseUrl + '/auth';
-
+  private baseUrl = 'http://localhost:9000/auth';
   private user!: User;
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  public login(loginRequest: LoginRequest): Observable<AuthSuccess> {
-    return this.httpClient.post<AuthSuccess>(`${this.apiUrl}/login`, loginRequest);
+  public login(request: LoginRequest): Observable<AuthSuccess> {
+    return this.http.post<AuthSuccess>(`${this.baseUrl}/login`, request);
   }
 
   public me(): Observable<User> {
-    return this.httpClient.get<User>(`${this.apiUrl}/me`);
+    return this.http.get<User>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
+      tap(user => this.user = user)
+    );
   }
 
   public getUser(): User {
     return this.user;
   }
-
-  public getUserInfo() {
-    return this.httpClient.get<User>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
-      tap(user => (this.user = user))
-    );
-  }
-
 }
